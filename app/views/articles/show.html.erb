@@ -1,0 +1,23 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <div class="mx-auto">
+    <% if notice.present? %>
+      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+    <% end %>
+
+    <h1 class="font-medium text-2xl mt-5">Article</h1>
+
+    <%= render @article %>
+
+    <%= link_to "Edit this article", edit_article_path(@article), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to "Back to articles", articles_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <div class="inline-block ml-2">
+      <%= button_to "Destroy this article", @article, method: :delete, class: "rounded-lg py-3 px-5 bg-red-600 text-white inline-block font-medium cursor-pointer" %>
+    </div>
+  </div>
+
+  <div class="mx-auto">
+    <h2 class="font-medium text-2xl mt-5">Comments</h2>
+    <%= render @article.comments %>
+    <%= render "comments/form" %>
+  </div>
+</div>
