@@ -1,0 +1,28 @@
+<div class="mt-5">
+<h3 class="text-3xl">Debug info</h3><br>
+<h4>Kamal version: <%= kamal_version %></h4><br>
+<h4>You are connected to hostname: <%= server_hostname %>, IP: <%= ip_address %></h4><br>
+
+<h4 class="text-2xl">Rails::Info</h4>
+<div id="rails_info">
+  <%= Rails::Info.to_html.html_safe %><br>
+  <% if ActiveRecord::Base.connection.respond_to?(:current_database) %>
+    <p>Current database: <%= ActiveRecord::Base.connection.current_database %></p>
+  <% end %>
+</div>
+
+<br>
+<h4 class="text-2xl">Sidekiq info</h4>
+<% if defined?(Sidekiq) %>
+  <% redis_info = Sidekiq.redis(&:info) %>
+  <p>Redis version: <%= redis_info["redis_version"] %></p>
+  <p>tcp port: <%= redis_info["tcp_port"] %></p>
+<% else %>
+  <p>Sidekiq is not defined / installed.</p>
+<% end %>
+
+<br>
+<h4 class="text-2xl">Action cable info</h4>
+<p>Adapter: <%= ActionCable.server.config.cable["adapter"] %></p>
+<p>Url: <%= ActionCable.server.config.cable["url"] || "not defined" %></p>
+</div>

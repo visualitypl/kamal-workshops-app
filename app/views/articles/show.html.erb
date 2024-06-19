@@ -1,10 +1,10 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <div class="mx-auto">
+<div class="mx-auto mt-5">
+  <div>
     <% if notice.present? %>
       <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
     <% end %>
 
-    <h1 class="font-medium text-2xl mt-5">Article</h1>
+    <h1 class="font-bold text-4xl">Article</h1>
 
     <%= render @article %>
 
@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div class="mx-auto">
+  <div>
     <h2 class="font-medium text-2xl mt-5">Comments</h2>
     <%= render @article.comments %>
     <%= render "comments/form" %>
