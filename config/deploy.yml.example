@@ -25,6 +25,9 @@ registry:
   password:
     - KAMAL_REGISTRY_PASSWORD
 
+volumes:
+  - "storage:/rails/storage"
+
 # Inject ENV variables into containers (secrets come from .env).
 # Remember to run `kamal env push` after making changes!
 env:
