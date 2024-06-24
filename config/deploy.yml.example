@@ -4,16 +4,12 @@ service: blog-space
 # Name of the container image.
 image: [USERNAME]/blog-space ## CHANGE ME
 
-# Deploy to these servers.
-# implicit form
 servers:
-  - [HOST IP] ## CHANGE ME
-
-# explicit form of:
-# servers:
-#   web:
-#     hosts:
-#       - [HOST IP]
+  web:
+    hosts:
+      - [HOST IP] ## CHANGE ME
+    options:
+      network: "kamal"
 
 # Credentials for your image host.
 registry:
@@ -25,54 +21,63 @@ registry:
   password:
     - KAMAL_REGISTRY_PASSWORD
 
-volumes:
-  - "storage:/rails/storage"
-
 # Inject ENV variables into containers (secrets come from .env).
 # Remember to run `kamal env push` after making changes!
 env:
 #  clear:
 #    DB_HOST: 192.168.0.2
   secret:
-    - SECRET_KEY_BASE
+    - RAILS_MASTER_KEY
+    - POSTGRES_PASSWORD
+    - POSTGRES_URL
+    - REDIS_PASSWORD
+    - REDIS_URL
 
 # Use a different ssh user than root
 # ssh:
 #   user: app
 
 builder:
+  args:
+    RUBY_VERSION: 3.3.3
   remote:
     arch: amd64
     host: ssh://build@[BUILDER IP] ## CHANGE ME
 
 # Use accessory services (secrets come from .env).
 # accessories:
-#   db:
-#     image: mysql:8.0
-#     host: 192.168.0.2
-#     port: 3306
-#     env:
-#       clear:
-#         MYSQL_ROOT_HOST: '%'
-#       secret:
-#         - MYSQL_ROOT_PASSWORD
-#     files:
-#       - config/mysql/production.cnf:/etc/mysql/my.cnf
-#       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/mysql
-#   redis:
-#     image: redis:7.0
-#     host: 192.168.0.2
-#     port: 6379
-#     directories:
-#       - data:/data
+accessories:
+  postgres:
+    image: "postgres:16-alpine"
+    roles:
+    - web
+    env:
+      clear:
+        POSTGRES_USER: "blog-space"
+        POSTGRES_DB: "blog-space_production"
+      secret:
+        - POSTGRES_PASSWORD
+    files:
+      - "config/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    directories:
+      - "data:/var/lib/postgresql/data"
+    options:
+      network: "kamal"
+
+  redis:
+    image: "redis:7.2-alpine"
+    roles:
+      - web
+    directories:
+      - data:/data
+    options:
+      network: "kamal"
+    cmd: "redis-server --requirepass <%= File.read('.env')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
 
 # Configure custom arguments for Traefik. Be sure to reboot traefik when you modify it.
-# traefik:
-#   args:
-#     accesslog: true
-#     accesslog.format: json
+traefik:
+  options:
+    network: "kamal"
 
 # Configure a custom healthcheck (default is /up on port 3000)
 # healthcheck:
