@@ -19,7 +19,7 @@ FROM base as build
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git pkg-config
+    apt-get install --no-install-recommends -y build-essential git pkg-config libpq-dev node-gyp python-is-python3
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
