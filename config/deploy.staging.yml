@@ -1,0 +1,16 @@
+servers:
+  web:
+    hosts:
+      - 164.92.239.159
+
+  worker:
+    hosts:
+      - 164.92.239.159
+
+env:
+  clear:
+    RAILS_ENV: "staging"
+
+accessories:
+  redis:
+    cmd: "redis-server --requirepass <%= File.read('.env.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
