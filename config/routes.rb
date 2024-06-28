@@ -11,5 +11,6 @@ Rails.application.routes.draw do
 
   resources :articles do
     resources :comments, only: [:create, :destroy]
+    post "delete_barons_comments", on: :member
   end
 end

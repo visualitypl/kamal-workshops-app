@@ -45,6 +45,12 @@ class ArticlesController < ApplicationController
     redirect_to articles_url, notice: "Article was successfully destroyed.", status: :see_other
   end
 
+  def delete_barons_comments
+    article = Article.find(params[:id])
+    DeleteBaronsCommentsJob.perform_later(article)
+    redirect_to article_url(article), notice: "Baron's comments will soon be gone!"
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_article

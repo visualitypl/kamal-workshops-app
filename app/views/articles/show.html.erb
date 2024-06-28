@@ -11,6 +11,9 @@
     <%= link_to "Edit this article", edit_article_path(@article), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
     <%= link_to "Back to articles", articles_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
     <div class="inline-block ml-2">
+      <%= button_to "Destroy Barons comments", delete_barons_comments_article_path(@article), method: :post, class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+    </div>
+    <div class="inline-block ml-2">
       <%= button_to "Destroy this article", @article, method: :delete, class: "rounded-lg py-3 px-5 bg-red-600 text-white inline-block font-medium cursor-pointer" %>
     </div>
   </div>
