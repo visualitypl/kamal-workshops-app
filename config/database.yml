@@ -17,7 +17,7 @@ test:
   <<: *default
   database: storage/test.sqlite3
 
-production:
+staging:
   <<: *default
   database: storage/staging.sqlite3
 
@@ -41,7 +41,7 @@ production:
 #  <<: *default
 #  database: blog_space_test
 
-#production:
+#staging:
 #  <<: *default
 #  database: blog_space_staging
 #  url: <%#= ENV["POSTGRES_URL"] %>
