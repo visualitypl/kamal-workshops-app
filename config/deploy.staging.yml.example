@@ -1,11 +1,11 @@
 servers:
   web:
     hosts:
-      - 164.92.239.159
+      - [HOST IP] ## CHANGE ME
 
   worker:
     hosts:
-      - 164.92.239.159
+      - [HOST IP] ## CHANGE ME
 
 env:
   clear:
