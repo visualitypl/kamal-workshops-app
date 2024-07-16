@@ -29,7 +29,7 @@ env:
   secret:
     - SECRET_KEY_BASE
     - POSTGRES_PASSWORD
-    - POSTGRES_URL
+    - DATABASE_URL
     - REDIS_PASSWORD
     - REDIS_URL
 
