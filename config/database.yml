@@ -44,9 +44,7 @@ production:
 #staging:
 #  <<: *default
 #  database: blog_space_staging
-#  url: <%#= ENV["POSTGRES_URL"] %>
 
 #production:
 #  <<: *default
 #  database: blog_space_production
-#  url: <%#= ENV["POSTGRES_URL"] %>
