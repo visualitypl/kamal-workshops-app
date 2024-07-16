@@ -31,15 +31,13 @@ env:
 #  clear:
 #    DB_HOST: 192.168.0.2
   secret:
-    - RAILS_MASTER_KEY
+    - SECRET_KEY_BASE
 
 # Use a different ssh user than root
 # ssh:
 #   user: app
 
 builder:
-  args:
-    RUBY_VERSION: 3.3.3
   remote:
     arch: amd64
     host: ssh://build@[BUILDER IP] ## CHANGE ME
