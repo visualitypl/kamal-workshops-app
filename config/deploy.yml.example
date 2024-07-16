@@ -57,12 +57,11 @@ accessories:
         POSTGRES_DB: "blog-space_production"
       secret:
         - POSTGRES_PASSWORD
-    files:
-      - "config/init.sql:/docker-entrypoint-initdb.d/init.sql"
     directories:
       - "data:/var/lib/postgresql/data"
     options:
       network: "kamal"
+      shm-size: "128mb"
 
   redis:
     image: "redis:7.2-alpine"
