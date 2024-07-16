@@ -38,3 +38,4 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 /config/deploy.yml
+/config/deploy.staging.yml
