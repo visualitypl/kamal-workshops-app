@@ -8,9 +8,11 @@ Sources:
 - [Kamal](https://kamal-deploy.org/)
 
 Pre-requisites:
-- Ruby 3.3.3
+- Ruby 3.3.4
 - installed and configured git
 - installed and configured ssh
+- ssh-key without passphrase
+- docker installed and updated
 
 This README would normally document whatever steps are necessary to get the
 application up and running.
