@@ -14,10 +14,11 @@ gem "tailwindcss-rails"
 gem "turbo-rails"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
-gem "sqlite3", "~> 1.4"
+# Database
+# gem "sqlite3", "~> 1.4"
 
-# gem "redis"
-# gem "pg"
+gem "redis"
+gem "pg"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
