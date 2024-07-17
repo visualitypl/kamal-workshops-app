@@ -8,10 +8,14 @@ service: blog-space
 image: kamaldh0/blog-space ## CHANGE ME
 
 # Deploy to these servers.
+# Get IP from the companion app at kamal.cklos.foo
+# Pick one of the hosts
 servers:
-  # Get it from the companion app at kamal.cklos.foo
-  # One of the hosts
-  - 255.255.255.255 ## CHANGE ME
+  web:
+    hosts:
+      - 255.255.255.100 ## CHANGE ME
+    options:
+      network: "kamal"
 
 # Credentials for your image host.
 registry:
@@ -24,62 +28,42 @@ registry:
 env:
   clear:
     FOO: bar
+    POSTGRES_HOST: blog-space-postgres
+    POSTGRES_USER: blog-space
+    POSTGRES_DB: blog_space_production
   secret:
     - SECRET_KEY_BASE
     - POSTGRES_PASSWORD
-    - DATABASE_URL
-    - REDIS_PASSWORD
-    - REDIS_URL
-
-# Use a different ssh user than root
-# ssh:
-#   user: app
 
 # Configure the builder to use for building the image.
 builder:
   remote:
     arch: amd64
-    host: ssh://build@[BUILDER IP] ## CHANGE ME
+    host: ssh://root@255.255.255.200 ## CHANGE ME
 
-# Use accessory services (secrets come from .env).
-# accessories:
 accessories:
   postgres:
     image: "postgres:16-alpine"
     roles:
-    - web
+      - web
     env:
       clear:
         POSTGRES_USER: "blog-space"
-        POSTGRES_DB: "blog-space_production"
+        POSTGRES_DB: "blog_space_production"
       secret:
         - POSTGRES_PASSWORD
+    files:
+      - "config/init.sql:/docker-entrypoint-initdb.d/init.sql"
     directories:
       - "data:/var/lib/postgresql/data"
     options:
       network: "kamal"
       shm-size: "128mb"
 
-  redis:
-    image: "redis:7.2-alpine"
-    roles:
-      - web
-    directories:
-      - data:/data
-    options:
-      network: "kamal"
-    cmd: "redis-server --requirepass <%= File.read('.env')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
-
-# Bridge fingerprinted assets, between versions to avoid
 # Configure custom arguments for Traefik. Be sure to reboot traefik when you modify it.
 traefik:
   options:
     network: "kamal"
-
-# Configure a custom healthcheck (default is /up on port 3000)
-# healthcheck:
-#   path: /healthz
-#   port: 4000
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old
