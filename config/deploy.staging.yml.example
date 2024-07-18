@@ -10,7 +10,12 @@ servers:
 env:
   clear:
     RAILS_ENV: "staging"
+    POSTGRES_DB: "blog_space_staging"
 
 accessories:
+  postgres:
+    files:
+      - "config/init.staging.sql:/docker-entrypoint-initdb.d/init.sql"
+
   redis:
     cmd: "redis-server --requirepass <%= File.read('.env.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
