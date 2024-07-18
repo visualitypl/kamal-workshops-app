@@ -27,7 +27,7 @@ git clone https://github.com/visualitypl/kamal-workshops-app.git
 gem install kamal
 ```
 
-## 3 First deployment
+## 3 Task 1 - Application with postgres
 
 Example files for this task:
 - [deploy.yml.example-1](config/deploy.yml.example-1)
@@ -90,6 +90,112 @@ kamal details
 
 Visit the app at http://#{IP}
 
+## 4 Task 2 - Adding redis and sidekiq
+
+Example files for this task:
+- [deploy.yml.example-2](config/deploy.yml.example-2)
+- [.env.example-2](.env.example-2)
+
+### 4.1 Add sidekiq to deploy.yml
+
+Add "worker" role to servers (save IP as web)
+
+```yaml
+servers:
+  worker:  
+    hosts:  
+      - 255.255.255.100 ## CHANGE ME 
+    cmd: bundle exec sidekiq  
+    options:  
+      network: "kamal"
+```
+
+### 4.2 Set Sidekiq as ActiveJob backend
+
+We will need to edit `config/environments/production.rb` and `config/environments/staging.rb`
+
+```ruby
+config.active_job.queue_adapter = :sidekiq
+```
+
+### 4.3 Add redis to deploy.yml
+
+Add "redis" accessory
+
+```yaml
+accessories:
+  redis:
+    image: "redis:7.2-alpine"
+    roles:
+      - web
+    directories:
+      - data:/data
+    options:
+      network: "kamal"
+    cmd: "redis-server --requirepass <%= File.read('.env')[/REDIS_PASSWORD="(.*?)"/, 1] %>"  
+```
+
+### 4.4 Add Redis env vars to .env
+
+Add two env vars to `.env`:
 
 - REDIS_PASSWORD (pick a password)
-- REDIS_URL (`"redis://:<REDIS_PASSWORD>@blog-space-redis:6379/0"`, substitute the password)
+- REDIS_URL (`"redis://:<REDIS_PASSWORD>@blog-space-redis:6379/0"`, substitute the password with above)
+
+### 4.5 Reference REDIS_URL in deploy.yml
+
+Add `REDIS_URL` to `env` section of deploy.yml
+
+```yaml
+env:
+  secret:
+    - SECRET_KEY_BASE
+    - POSTGRES_PASSWORD
+    - REDIS_URL
+```
+
+### 4.6 Use Redis as ActiveCable backend
+
+Edit `config/cable.yml` and set `adapter: redis` on production and staging
+
+```yaml
+staging:
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL", "") %>
+  channel_prefix: blog_space_production
+
+production:
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL", "") %>
+  channel_prefix: blog_space_production
+```
+### 4.7 Commit the changes
+
+```shell
+git add -A
+git commit -m "Add redis and sidekiq"
+```
+
+### 4.8 Push env vars to the server
+
+```shell
+kamal env push
+```
+
+### 4.9 Start redis accessory and deploy the app
+
+```shell
+kamal accessory boot redis
+kamal deploy
+```
+
+### 4.10 Check the result
+
+To check the result, run:
+
+```shell
+kamal audit
+kamal details
+```
+
+Visit the app at http://#{IP}

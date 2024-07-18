@@ -8,10 +8,10 @@ staging:
   adapter: async
 #  adapter: redis
 #  url: <%#= ENV.fetch("REDIS_URL", "") %>
-#  channel_prefix: kamal_workshops_app_staging
+#  channel_prefix: blog_space_staging
 
 production:
   adapter: async
 #  adapter: redis
-#  url: <%#= ENV.fetch("REDIS_URL", "") %>
-#  channel_prefix: kamal_workshops_app_production
+#  url: <%= ENV.fetch("REDIS_URL", "") %>
+#  channel_prefix: blog_space_production
