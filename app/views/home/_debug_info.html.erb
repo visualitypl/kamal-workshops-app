@@ -13,8 +13,7 @@
 
 <br>
 <h4 class="text-2xl">Sidekiq info</h4>
-<% if defined?(Sidekiq) %>
-  <% redis_info = Sidekiq.redis(&:info) %>
+<% if defined?(Sidekiq) && redis_info %>
   <p>Redis version: <%= redis_info["redis_version"] %></p>
   <p>tcp port: <%= redis_info["tcp_port"] %></p>
 <% else %>
