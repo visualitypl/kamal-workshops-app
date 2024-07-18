@@ -272,3 +272,73 @@ kamal details -d staging
 ```
 
 Visit the app at http://#{STAGING-IP}
+
+## 6. Breaking and fixing
+
+### 6.1 Breaking
+
+We will break the app by generating a migration that will fail.
+
+```shell
+bundle exec rails generate migration addAuthorToArticle
+```
+
+```ruby
+class AddAuthorToArticle < ActiveRecord::Migration[7.1]
+  def change
+    add_column :articles, :author, :string, null: false
+  end
+end
+```
+
+Commit the changes and push them to the server.
+
+```shell
+git add -A
+git commit -m "Add author to article"
+kamal deploy
+```
+
+Inspect the output of the deploy command and notice that
+the app have not been deployed to the server.
+
+### 6.2 Breaking even more
+
+Fix the migration by adding a default value to the author column.
+BUT at the same time break something else.
+
+```ruby
+class AddAuthorToArticle < ActiveRecord::Migration[7.1]
+  def change
+    add_column :articles, :author, :string, null: false, default: ""
+  end
+end
+```
+
+Comment the "delete_barons_comments" route in `config/routes.rb`
+
+```ruby
+# post "delete_barons_comments", on: :member
+```
+
+Commit the changes and push them to the server.
+
+This time the migration were applied to the database.
+But "the core functionality" of the app is lost.
+
+### 6.3 The Rollback
+
+Rollback to previous version of the app:
+
+```shell
+kamal rollback <VERSION>
+
+# to find the version run:
+kamal audit
+```
+
+### 6.4 Cleanup
+
+Remove the migration that we added previously.
+
+This task has no solution here ;)
