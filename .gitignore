@@ -10,7 +10,8 @@
 # Ignore all environment files (except templates).
 /.env*
 !/.env*.erb
-!/.env.template
+!/.env.*example*
+!/.env.*template*
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -39,3 +40,5 @@
 !/app/assets/builds/.keep
 /config/deploy.yml
 /config/deploy.staging.yml
+!/config/deploy.yml.*example*
+!/config/deploy.yml.*template*
