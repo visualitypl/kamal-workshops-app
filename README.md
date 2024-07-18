@@ -89,3 +89,7 @@ kamal details
 ```
 
 Visit the app at http://#{IP}
+
+
+- REDIS_PASSWORD (pick a password)
+- REDIS_URL (`"redis://:<REDIS_PASSWORD>@blog-space-redis:6379/0"`, substitute the password)
