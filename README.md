@@ -35,7 +35,7 @@ Example files for this task:
 
 ### 3.1 Add kamal to blog-space
 ```
-kamal init blog-space
+kamal init
 ```
 
 ### 3.2 Setup deploy.yml
@@ -56,8 +56,6 @@ We will need to edit:
 - KAMAL_REGISTRY_PASSWORD (Docker Hub token from the companion app)
 - SECRET_KEY_BASE (generate secret key base with `rails secret`)
 - POSTGRES_PASSWORD (pick a password)
-- REDIS_PASSWORD (pick a password)
-- REDIS_URL (`"redis://:<REDIS_PASSWORD>@blog-space-redis:6379/0"`, substitute the password)
 
 ### 3.4 Setup docker-setup kamal hook
 
