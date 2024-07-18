@@ -5,11 +5,13 @@ test:
   adapter: test
 
 staging:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL", "") %>
-  channel_prefix: kamal_workshops_app_staging
+  adapter: async
+#  adapter: redis
+#  url: <%#= ENV.fetch("REDIS_URL", "") %>
+#  channel_prefix: kamal_workshops_app_staging
 
 production:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL", "") %>
-  channel_prefix: kamal_workshops_app_production
+  adapter: async
+#  adapter: redis
+#  url: <%#= ENV.fetch("REDIS_URL", "") %>
+#  channel_prefix: kamal_workshops_app_production
