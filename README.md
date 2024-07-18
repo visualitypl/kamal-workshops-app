@@ -199,3 +199,76 @@ kamal details
 ```
 
 Visit the app at http://#{IP}
+
+## 5. Deploy staging destination
+
+Example files for this task:
+- [deploy.staging.yml.example](config/deploy.staging.yml.example)
+- [.env.staging.example](.env.staging.example)
+
+### 5.1 Add config for staging destination
+
+Create `config/deploy.staging.yml`.
+We only need to override values from `config/deploy.yml` that are different for staging.
+
+```yaml
+servers:
+  web:
+    hosts:
+      - [HOST IP] ## CHANGE ME
+
+  worker:
+    hosts:
+      - [HOST IP] ## CHANGE ME
+
+env:
+  clear:
+    RAILS_ENV: "staging"
+    POSTGRES_DB: "blog_space_staging"
+
+accessories:
+  postgres:
+    files:
+      - "config/init.staging.sql:/docker-entrypoint-initdb.d/init.sql"
+
+  redis:
+    cmd: "redis-server --requirepass <%= File.read('.env.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
+```
+
+### 5.2 Add env vars for staging destination
+
+Create `.env.staging` and add:
+
+- SECRET_KEY_BASE (generate secret key base with `rails secret`)
+- POSTGRES_PASSWORD (pick a password)
+- REDIS_PASSWORD (pick a password)
+- REDIS_URL (`"redis://:<REDIS_PASSWORD>@blog-space-redis:6379/0"`, substitute the password with above)
+
+Notice that we are not setting `KAMAL_REGISTRY_PASSWORD` env var, because we are using the same one as in production.
+
+### 5.3 Deploy
+
+To use kamal with staging destination we need to pass `-d staging` flag to all commands.
+Like before we need to setup docker on hosts, push env, deploy postgres accessory and deploy the app.
+
+```shell
+kamal setup -d staging
+```
+
+```shell
+kamal server bootstrap -d staging
+kamal env push -d staging
+kamal accessory boot all -d staging
+kamal deploy -d staging
+```
+
+### 5.4 Check the result
+
+To check the result, run:
+
+```shell
+kamal audit -d staging
+kamal details -d staging
+```
+
+Visit the app at http://#{STAGING-IP}
