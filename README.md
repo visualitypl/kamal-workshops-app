@@ -8,7 +8,7 @@ Sources:
 - [Kamal](https://kamal-deploy.org/)
 
 Pre-requisites:
-- Ruby 3.3.4
+- Ruby 3.3.5
 - installed and configured git
 - installed and configured ssh
 - ssh-key without passphrase

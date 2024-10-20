@@ -67,8 +67,8 @@ Rails.application.configure do
   # config.cache_store = :mem_cache_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
-  # config.active_job.queue_adapter = :sidekiq
-  # config.active_job.queue_name_prefix = "kamal_workshops_app_production"
+  config.active_job.queue_adapter = :sidekiq
+  config.active_job.queue_name_prefix = "kamal_workshops_app_production"
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
