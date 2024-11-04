@@ -13,4 +13,6 @@ Rails.application.routes.draw do
     resources :comments, only: [:create, :destroy]
     post "delete_barons_comments", on: :member
   end
+
+  mount Sidekiq::Web => "/sidekiq" # mount Sidekiq::Web in your Rails app
 end
