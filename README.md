@@ -90,6 +90,7 @@ gem "kamal", require: false
 
 ### 3.2 initialize kamal
 ```
+bundle install
 kamal init
 ```
 
