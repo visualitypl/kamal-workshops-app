@@ -1,13 +1,13 @@
 source "https://rubygems.org"
 
-ruby "3.3.5"
+ruby "3.4.1"
 
 gem "rails", "~> 7.1.3", ">= 7.1.3.3"
 
 gem "bootsnap", require: false
 gem "faker"
 gem "importmap-rails"
-gem "kamal", require: false
+# gem "kamal", require: false
 gem "pg"
 gem "puma", ">= 5.0"
 gem "redis"

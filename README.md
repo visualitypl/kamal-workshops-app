@@ -8,7 +8,7 @@ Sources:
 - [Kamal](https://kamal-deploy.org/)
 
 Pre-requisites:
-- Ruby 3.3.5
+- Ruby 3.4.1
 - installed and configured git
 - installed and configured ssh
 - ssh-key without passphrase
@@ -16,29 +16,84 @@ Pre-requisites:
 
 # Workshop instructions
 
-## 1. Sign up to the Companion app at kamal.cklos.foo
+## TASK 1—Sign up to the Companion app
+1. Find or create an SSH key without a passphrase
 
-## 2 Clone the blog-space and install Kamal
+   https://linuxize.com/post/how-to-setup-passwordless-ssh-login/#setup-ssh-passwordless-login
 
+2. Go to `kamal.cklos.foo`
+3. Click on `Sign up` button
+4. Enter signup code form slides, username, password, **PUBLIC** part of SSH key
+5. Test your SSH connection to assigned servers
+
+## TASK 2—Create a new Rails 8 app and deploy it with Kamal
+
+1. Generate a new application
+    ```
+    gem update rails
+    rails _8.0.1_ new kamal-workshops-new
+    ```
+
+2. Add Posts scaffold (optional)
+    ```
+    bin/rails generate scaffold Posts title:string 
+    bin/rails db:migrate
+    ```
+
+3. Edit `config/deploy.yml`
+    ```
+    image: <docker_username- e.g. kamal_gh_1>/kamal_workshops_new
+    
+    servers:
+      web:
+        - <IP address - e.g. 255.255.255.100>
+    
+    registry:
+      username: <docker_username - e.g. kamal_gh_1>
+    ```
+
+4. Set KAMAL_REGISTRY_PASSWORD environment variable in terminal
+    ```
+    export KAMAL_REGISTRY_PASSWORD=<docker_token>
+    ```
+   
+5. Commit changes
+6. Deploy with `kamal setup`
+7. Go to `pluto.cklos.foo`
+
+   You have deployed your application.
+8. Add TLS. Edit `config/deploy.yml`
+   ```
+    proxy:
+      ssl: false
+      host: <Host - e.g pluto.cklos.foo>
+    ```
+9. Commit changes
+10. Deploy with `kamal deploy`
+
+## 3 Task 3—Migrate Rails 7 app to Kamal deployment
+
+### 3.0 Clone the repository
 ```
 git clone git@github.com:visualitypl/kamal-workshops-app.git
 git clone https://github.com/visualitypl/kamal-workshops-app.git
-
-gem install kamal
 ```
-
-## 3 Task 1 - Application with postgres
 
 Example files for this task:
 - [deploy.yml.example-1](config/deploy.yml.example-1)
 - [.env.example-1](.env.example-1)
 
-### 3.1 Add kamal to blog-space
+### 3.1 Add kamal to Gemfile
+```
+gem "kamal", require: false
+```
+
+### 3.2 initialize kamal
 ```
 kamal init
 ```
 
-### 3.2 Setup deploy.yml
+### 3.3 Setup deploy.yml
 
 We will need to edit:
 
@@ -47,20 +102,14 @@ We will need to edit:
 - servers (IP from the companion app)
 - registry (username: #{Docker Hub username from the companion app})
 - env (clear, secret)
-- builder (remote: [arch: amd64, host: #{from the companion app}])
 
-### 3.3 Setup .env
+### 3.4 Setup .env
 
 We will need to edit:
 
 - KAMAL_REGISTRY_PASSWORD (Docker Hub token from the companion app)
 - SECRET_KEY_BASE (generate secret key base with `rails secret`)
 - POSTGRES_PASSWORD (pick a password)
-
-### 3.4 Setup docker-setup kamal hook
-
-We will need to rename docker-setup.sample to docker-setup
-in .kamal/hooks/ directory
 
 ### 3.5 Deploy
 
