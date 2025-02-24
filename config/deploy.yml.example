@@ -1,0 +1,59 @@
+service: blog-space
+image: kamaldh1/blog-space ## change username
+
+servers:
+  web:
+    hosts:
+     - 138.68.69.255 ## change username
+
+  worker:
+    hosts:
+      - 138.68.69.255 ## change username
+    cmd: bundle exec sidekiq
+
+proxy:
+  ssl: true
+  host: bear.1982312.xyz
+
+registry:
+  username: kamaldh1
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+
+env:
+  clear:
+    RAILS_ENV: production
+    POSTGRES_HOST: blog-space-postgres
+    POSTGRES_USER: blog-space
+    POSTGRES_DB: blog_space_production
+  secret:
+    - SECRET_KEY_BASE
+    - POSTGRES_PASSWORD
+    - REDIS_URL
+
+asset_path: /rails/public/assets
+
+accessories:
+  postgres:
+    image: "postgres:16-alpine"
+    host: 138.68.69.255
+    env:
+      clear:
+        POSTGRES_USER: "blog-space"
+        POSTGRES_DB: "blog_space_production"
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - "data:/var/lib/postgresql/data"
+    options:
+      shm-size: "128mb"
+
+  redis:
+    image: "redis:7.2-alpine"
+    host: 138.68.69.255
+    directories:
+      - data:/data
+    cmd: "redis-server --requirepass <%= File.read('.kamal/secrets')[/REDIS_PASSWORD="(.*?)"/, 1] %>"

@@ -1,21 +1,24 @@
 servers:
   web:
     hosts:
-      - [HOST IP] ## CHANGE ME
+      - 209.38.199.143
 
-  worker:
+  job:
     hosts:
-      - [HOST IP] ## CHANGE ME
+      - 209.38.199.143
+
+proxy:
+  host: bear.8301738.xyz
 
 env:
   clear:
-    RAILS_ENV: "staging"
-    POSTGRES_DB: "blog_space_staging"
+    RAILS_ENV: staging
+    POSTGRES_DB: blog_space_staging
 
 accessories:
   postgres:
-    files:
-      - "config/init.staging.sql:/docker-entrypoint-initdb.d/init.sql"
+    host: 209.38.199.143
 
   redis:
-    cmd: "redis-server --requirepass <%= File.read('.env.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
+    host: 209.38.199.143
+    cmd: "redis-server --requirepass <%= File.read('.kamal/secrets.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"

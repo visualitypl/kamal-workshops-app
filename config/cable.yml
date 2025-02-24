@@ -5,13 +5,11 @@ test:
   adapter: test
 
 staging:
-  adapter: async
-#  adapter: redis
-#  url: <%#= ENV.fetch("REDIS_URL", "") %>
-#  channel_prefix: blog_space_staging
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL", "") %>
+  channel_prefix: blog_space_staging
 
 production:
-  adapter: async
-#  adapter: redis
-#  url: <%= ENV.fetch("REDIS_URL", "") %>
-#  channel_prefix: blog_space_production
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL", "") %>
+  channel_prefix: blog_space_production
