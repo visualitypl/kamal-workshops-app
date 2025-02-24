@@ -39,6 +39,7 @@ Pre-requisites:
     bin/rails generate scaffold Posts title:string 
     bin/rails db:migrate
     ```
+    set `root "posts#index"` in `config/routes.rb`
 
 3. Edit `config/deploy.yml`
     ```
@@ -47,6 +48,10 @@ Pre-requisites:
     servers:
       web:
         - <IP address - e.g. 255.255.255.100>
+   
+    proxy:
+      ssl: true
+      host: <Host - e.g pluto.cklos.foo>
     
     registry:
       username: <docker_username - e.g. kamal_gh_1>
@@ -62,74 +67,71 @@ Pre-requisites:
 7. Go to `pluto.cklos.foo`
 
    You have deployed your application.
-8. Add TLS. Edit `config/deploy.yml`
-   ```
-    proxy:
-      ssl: false
-      host: <Host - e.g pluto.cklos.foo>
-    ```
-9. Commit changes
-10. Deploy with `kamal deploy`
 
-## 3 Task 3—Migrate Rails 7 app to Kamal deployment
+## Task 3—Migrate Rails 7 app to Kamal deployment
 
-### 3.0 Clone the repository
+### 0 Clone the repository
 ```
 git clone git@github.com:visualitypl/kamal-workshops-app.git
 git clone https://github.com/visualitypl/kamal-workshops-app.git
 ```
 
 Example files for this task:
-- [deploy.yml.example-1](config/deploy.yml.example-1)
-- [.env.example-1](.env.example-1)
+- [deploy.yml.example](config/deploy.yml.example-1)
+- [.secrets.example](.env.example-1)
 
-### 3.1 Add kamal to Gemfile
+### 1 Add kamal to Gemfile
 ```
 gem "kamal", require: false
 ```
 
-### 3.2 initialize kamal
+### 2 initialize kamal
 ```
 bundle install
 kamal init
 ```
 
-### 3.3 Setup deploy.yml
+### 3 Setup deploy.yml
 
 We will need to edit:
 
 - service (name of the app: blog-space)
 - image (#{Docker Hub username from the companion app}/#{name of the app})
 - servers (IP from the companion app)
+- proxy (with hostname)
 - registry (username: #{Docker Hub username from the companion app})
 - env (clear, secret)
+- accessories
 
-### 3.4 Setup .env
+### 4 Setup .kamal/secrets
 
 We will need to edit:
 
 - KAMAL_REGISTRY_PASSWORD (Docker Hub token from the companion app)
 - SECRET_KEY_BASE (generate secret key base with `rails secret`)
-- POSTGRES_PASSWORD (pick a password)
+- POSTGRES_PASSWORD (pick any password)
+- REDIS_PASSWORD (pick any password)
+- REDIS_URL (substitute password in string: "redis://:$REDIS_PASSWORD@blog-space-redis:6379/0")
 
-### 3.5 Deploy
+### 5 Deploy
 
-To prepare docker on hosts, push env, deploy postgres accessory and deploy the app we need to run:
+To install docker, start postgres and redis containers, kamal-proxy and deploy the app we need to run:
 
 ```shell
 kamal server bootstrap
 kamal env push
-kamal accessory boot postgres
+kamal accessory boot postgres && kamal accessory boot redis 
+# or kamal accessory boot all
 kamal deploy
 ```
 
-Alternatively, you can run command that calls all the above:
+Alternatively, you can run a command that calls all the above:
 
 ```shell
 kamal setup
 ```
 
-### 3.6 Check the result
+### 6 Check the result
 
 To check the result, run:
 
@@ -138,119 +140,9 @@ kamal audit
 kamal details
 ```
 
-Visit the app at http://#{IP}
+Visit the app at hostname you set in the proxy.
 
-## 4 Task 2 - Adding redis and sidekiq
-
-Example files for this task:
-- [deploy.yml.example-2](config/deploy.yml.example-2)
-- [.env.example-2](.env.example-2)
-
-### 4.1 Add sidekiq to deploy.yml
-
-Add "worker" role to servers (save IP as web)
-
-```yaml
-servers:
-  worker:  
-    hosts:  
-      - 255.255.255.100 ## CHANGE ME 
-    cmd: bundle exec sidekiq  
-    options:  
-      network: "kamal"
-```
-
-### 4.2 Set Sidekiq as ActiveJob backend
-
-We will need to edit `config/environments/production.rb` and `config/environments/staging.rb`
-
-```ruby
-config.active_job.queue_adapter = :sidekiq
-```
-
-### 4.3 Add redis to deploy.yml
-
-Add "redis" accessory
-
-```yaml
-accessories:
-  redis:
-    image: "redis:7.2-alpine"
-    roles:
-      - web
-    directories:
-      - data:/data
-    options:
-      network: "kamal"
-    cmd: "redis-server --requirepass <%= File.read('.env')[/REDIS_PASSWORD="(.*?)"/, 1] %>"  
-```
-
-### 4.4 Add Redis env vars to .env
-
-Add two env vars to `.env`:
-
-- REDIS_PASSWORD (pick a password)
-- REDIS_URL (`"redis://:<REDIS_PASSWORD>@blog-space-redis:6379/0"`, substitute the password with above)
-
-### 4.5 Reference REDIS_URL in deploy.yml
-
-Add `REDIS_URL` to `env` section of deploy.yml
-
-```yaml
-env:
-  secret:
-    - SECRET_KEY_BASE
-    - POSTGRES_PASSWORD
-    - REDIS_URL
-```
-
-### 4.6 Use Redis as ActiveCable backend
-
-Edit `config/cable.yml` and set `adapter: redis` on production and staging
-
-```yaml
-staging:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL", "") %>
-  channel_prefix: blog_space_production
-
-production:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL", "") %>
-  channel_prefix: blog_space_production
-```
-### 4.7 Commit the changes
-
-```shell
-git add -A
-git commit -m "Add redis and sidekiq"
-```
-
-### 4.8 Push env vars to the server
-
-```shell
-kamal env push
-```
-
-### 4.9 Start redis accessory and deploy the app
-
-```shell
-kamal accessory boot redis
-kamal deploy
-```
-
-### 4.10 Check the result
-
-To check the result, run:
-
-```shell
-kamal audit
-kamal details
-```
-
-Visit the app at http://#{IP}
-
-## 5. Deploy staging destination
+## Task 4-Deploy staging destination
 
 Example files for this task:
 - [deploy.staging.yml.example](config/deploy.staging.yml.example)
