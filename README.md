@@ -77,8 +77,8 @@ git clone https://github.com/visualitypl/kamal-workshops-app.git
 ```
 
 Example files for this task:
-- [deploy.yml.example](config/deploy.yml.example-1)
-- [.secrets.example](.env.example-1)
+- [deploy.yml.example](config/deploy.yml.example)
+- [.secrets.example](.secrets.example)
 
 ### 1 Add kamal to Gemfile
 ```
@@ -93,12 +93,12 @@ kamal init
 
 ### 3 Setup deploy.yml
 
-We will need to edit:
+We will need to set:
 
 - service (name of the app: blog-space)
 - image (#{Docker Hub username from the companion app}/#{name of the app})
 - servers (IP from the companion app)
-- proxy (with hostname)
+- proxy (hostname)
 - registry (username: #{Docker Hub username from the companion app})
 - env (clear, secret)
 - accessories
@@ -146,9 +146,9 @@ Visit the app at hostname you set in the proxy.
 
 Example files for this task:
 - [deploy.staging.yml.example](config/deploy.staging.yml.example)
-- [.env.staging.example](.env.staging.example)
+- [.secrets.example](.secrets.example)
 
-### 5.1 Add config for staging destination
+### 1 Add config for staging destination
 
 Create `config/deploy.staging.yml`.
 We only need to override values from `config/deploy.yml` that are different for staging.
@@ -157,11 +157,14 @@ We only need to override values from `config/deploy.yml` that are different for 
 servers:
   web:
     hosts:
-      - [HOST IP] ## CHANGE ME
+      - 209.38.199.143
 
   worker:
     hosts:
-      - [HOST IP] ## CHANGE ME
+      - 209.38.199.143
+
+proxy:
+   host: bear.8301738.xyz
 
 env:
   clear:
@@ -169,29 +172,28 @@ env:
     POSTGRES_DB: "blog_space_staging"
 
 accessories:
-  postgres:
-    files:
-      - "config/init.staging.sql:/docker-entrypoint-initdb.d/init.sql"
+   postgres:
+      host: 209.38.199.143
 
-  redis:
-    cmd: "redis-server --requirepass <%= File.read('.env.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
+   redis:
+      host: 209.38.199.143
+      cmd: "redis-server --requirepass <%= File.read('.kamal/secrets.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
 ```
 
-### 5.2 Add env vars for staging destination
+### 2 Add secrets for staging destination
 
-Create `.env.staging` and add:
+Create `.kamal/secrets.staging` and add:
 
+- KAMAL_REGISTRY_PASSWORD (Docker Hub token from the companion app)
 - SECRET_KEY_BASE (generate secret key base with `rails secret`)
-- POSTGRES_PASSWORD (pick a password)
-- REDIS_PASSWORD (pick a password)
-- REDIS_URL (`"redis://:<REDIS_PASSWORD>@blog-space-redis:6379/0"`, substitute the password with above)
+- POSTGRES_PASSWORD (pick any password)
+- REDIS_PASSWORD (pick any password)
+- REDIS_URL (substitute password in string: "redis://:$REDIS_PASSWORD@blog-space-redis:6379/0")
 
-Notice that we are not setting `KAMAL_REGISTRY_PASSWORD` env var, because we are using the same one as in production.
+### 3 Deploy
 
-### 5.3 Deploy
-
-To use kamal with staging destination we need to pass `-d staging` flag to all commands.
-Like before we need to setup docker on hosts, push env, deploy postgres accessory and deploy the app.
+To use kamal with staging destination, we need to pass `-d staging` flag to all commands.
+Like before, we need to set up docker on hosts, deploy postgres and redis accessories and deploy the app.
 
 ```shell
 kamal setup -d staging
@@ -204,7 +206,7 @@ kamal accessory boot all -d staging
 kamal deploy -d staging
 ```
 
-### 5.4 Check the result
+### 4 Check the result
 
 To check the result, run:
 
@@ -213,11 +215,11 @@ kamal audit -d staging
 kamal details -d staging
 ```
 
-Visit the app at http://#{STAGING-IP}
+Visit the app.
 
-## 6. Breaking and fixing
+## Task 5-Breaking and fixing
 
-### 6.1 Breaking
+### 1 Breaking
 
 We will break the app by generating a migration that will fail.
 
@@ -244,7 +246,7 @@ kamal deploy
 Inspect the output of the deploy command and notice that
 the app have not been deployed to the server.
 
-### 6.2 Breaking even more
+### 2 Breaking even more
 
 Fix the migration by adding a default value to the author column.
 BUT at the same time break something else.
@@ -268,18 +270,18 @@ Commit the changes and push them to the server.
 This time the migration were applied to the database.
 But "the core functionality" of the app is lost.
 
-### 6.3 The Rollback
+### 3 The Rollback
 
-Rollback to previous version of the app:
+Rollback to a previous version of the app:
 
 ```shell
-kamal rollback <VERSION>
-
 # to find the version run:
 kamal audit
+
+kamal rollback <VERSION>
 ```
 
-### 6.4 Cleanup
+### 4 Cleanup
 
 Remove the migration that we added previously.
 
