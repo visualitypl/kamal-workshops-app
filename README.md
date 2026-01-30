@@ -1,6 +1,6 @@
 # README
 
-This is a simple Rails 7.1 application built based on Rails "blog app" guide.
+This is a simple Rails 7.2 application built based on Rails "blog app" guide.
 We will be using this app to learn how to deploy a Rails app to VPS with Kamal.
 
 Sources:
@@ -228,7 +228,7 @@ bundle exec rails generate migration addAuthorToArticle
 ```
 
 ```ruby
-class AddAuthorToArticle < ActiveRecord::Migration[7.1]
+class AddAuthorToArticle < ActiveRecord::Migration[7.2]
   def change
     add_column :articles, :author, :string, null: false
   end
@@ -252,7 +252,7 @@ Fix the migration by adding a default value to the author column.
 BUT at the same time break something else.
 
 ```ruby
-class AddAuthorToArticle < ActiveRecord::Migration[7.1]
+class AddAuthorToArticle < ActiveRecord::Migration[7.2]
   def change
     add_column :articles, :author, :string, null: false, default: ""
   end
