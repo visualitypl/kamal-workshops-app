@@ -1,8 +1,8 @@
 source "https://rubygems.org"
 
-ruby "3.4.1"
+ruby "3.4.8"
 
-gem "rails", "~> 7.1.3", ">= 7.1.3.3"
+gem "rails", "~> 7.2.3"
 
 gem "bootsnap", require: false
 gem "faker"
