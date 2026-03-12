@@ -1,27 +1,31 @@
+<% require "dotenv"; Dotenv.load(".env") %>
+
 service: blog-space
 image: kamaldh1/blog-space ## change username
 
 servers:
   web:
     hosts:
-     - 138.68.69.255 ## change username
+     - 000.000.000.000 ## change ip
 
   worker:
     hosts:
-      - 138.68.69.255 ## change username
+      - 000.000.000.000 ## change ip
     cmd: bundle exec sidekiq
 
 proxy:
   ssl: true
-  host: bear.1982312.xyz
+  host: app.00000000.xyz  ## change domain
 
 registry:
-  username: kamaldh1
+  username: kamaldh1 ## change username
   password:
     - KAMAL_REGISTRY_PASSWORD
 
 builder:
   arch: amd64
+  remote: ssh://root@999.999.999.999 ## change IP
+
 
 env:
   clear:
@@ -39,7 +43,7 @@ asset_path: /rails/public/assets
 accessories:
   postgres:
     image: "postgres:16-alpine"
-    host: 138.68.69.255
+    host: 000.000.000.000 ## change ip
     env:
       clear:
         POSTGRES_USER: "blog-space"
@@ -53,7 +57,7 @@ accessories:
 
   redis:
     image: "redis:7.2-alpine"
-    host: 138.68.69.255
+    host: 000.000.000.000 ## change ip
     directories:
       - data:/data
-    cmd: "redis-server --requirepass <%= File.read('.kamal/secrets')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
+    cmd: redis-server --requirepass <%= ENV["REDIS_PASSWORD"] %>

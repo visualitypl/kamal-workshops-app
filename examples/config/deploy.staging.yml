@@ -1,0 +1,24 @@
+servers:
+  web:
+    hosts:
+      - 999.999.999.999 ## change IP
+
+  job:
+    hosts:
+      - 999.999.999.999 ## change IP
+
+proxy:
+  host: staging.00000000.xyz  ## change domain
+
+env:
+  clear:
+    RAILS_ENV: staging
+    POSTGRES_DB: blog_space_staging
+
+accessories:
+  postgres:
+    host: 999.999.999.999 ## change IP
+
+  redis:
+    host: 999.999.999.999 ## change IP
+    cmd: redis-server --requirepass <%= ENV["REDIS_PASSWORD"] %>

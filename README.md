@@ -31,7 +31,7 @@ Pre-requisites:
 1. Generate a new application
     ```
     gem update rails
-    rails _8.0.1_ new kamal-workshops-new
+    rails new kamal-workshops-new
     ```
 
 2. Add Posts scaffold (optional)
@@ -47,11 +47,11 @@ Pre-requisites:
     
     servers:
       web:
-        - <IP address - e.g. 255.255.255.100>
+        - 000.000.000.000 <1st IP address>
    
     proxy:
       ssl: true
-      host: <Host - e.g pluto.cklos.foo>
+      host: <app.123456.xyz>
     
     registry:
       username: <docker_username - e.g. kamal_gh_1>
@@ -62,9 +62,15 @@ Pre-requisites:
     export KAMAL_REGISTRY_PASSWORD=<docker_token>
     ```
    
-5. Commit changes
-6. Deploy with `kamal setup`
-7. Go to `pluto.cklos.foo`
+5. Uncomment `KAMAL_REGISTRY_PASSWORD` and `RAILS_MASTER_KEY` in `.kamal/secrets`
+   ```
+   KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD
+   RAILS_MASTER_KEY=$(cat config/master.key)
+   ```
+   
+6. Commit changes
+7. Deploy with `kamal setup`
+8. Go to `app.123456.xyz`
 
    You have deployed your application.
 
@@ -77,8 +83,9 @@ git clone https://github.com/visualitypl/kamal-workshops-app.git
 ```
 
 Example files for this task:
-- [deploy.yml.example](config/deploy.yml.example)
-- [.secrets.example](.secrets.example)
+- [examples/config/deploy.yml](examples/config/deploy.yml)
+- [examples/.kamal/secrets](examples/.kamal/secrets)
+- [examples/.env](examples/.env)
 
 ### 1 Add kamal to Gemfile
 ```
@@ -95,25 +102,37 @@ kamal init
 
 We will need to set:
 
+- `<% require "dotenv"; Dotenv.load(".env") %>` at the top of the file
 - service (name of the app: blog-space)
 - image (#{Docker Hub username from the companion app}/#{name of the app})
 - servers (IP from the companion app)
 - proxy (hostname)
+- builder (arch and connection string)
 - registry (username: #{Docker Hub username from the companion app})
 - env (clear, secret)
 - accessories
 
-### 4 Setup .kamal/secrets
+### 4 Setup .env
 
-We will need to edit:
+We will need to set:
 
-- KAMAL_REGISTRY_PASSWORD (Docker Hub token from the companion app)
 - SECRET_KEY_BASE (generate secret key base with `rails secret`)
+- KAMAL_REGISTRY_PASSWORD (Docker Hub token from the companion app)
 - POSTGRES_PASSWORD (pick any password)
 - REDIS_PASSWORD (pick any password)
-- REDIS_URL (substitute password in string: "redis://:$REDIS_PASSWORD@blog-space-redis:6379/0")
+- REDIS_URL (dotenv will substitute password in string: "redis://:${REDIS_PASSWORD}@blog-space-redis:6379/0")
 
-### 5 Deploy
+### 5 Setup .kamal/secrets
+
+We will need to tell kamal how to access the secrets. Read from the local envvars:
+
+SECRET_KEY_BASE=$SECRET_KEY_BASE
+KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD
+POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+REDIS_PASSWORD=$REDIS_PASSWORD
+REDIS_URL=$REDIS_URL
+
+### 6 Deploy
 
 To install docker, start postgres and redis containers, kamal-proxy and deploy the app we need to run:
 
@@ -145,8 +164,8 @@ Visit the app at hostname you set in the proxy.
 ## Task 4-Deploy staging destination
 
 Example files for this task:
-- [deploy.staging.yml.example](config/deploy.staging.yml.example)
-- [.secrets.example](.secrets.example)
+- [examples/config/deploy.staging.yml](examples/config/deploy.staging.yml)
+- [examples/.env](examples/.env)
 
 ### 1 Add config for staging destination
 
@@ -157,14 +176,14 @@ We only need to override values from `config/deploy.yml` that are different for 
 servers:
   web:
     hosts:
-      - 209.38.199.143
+      - 999.999.999.999 # <2nd IP address>
 
   worker:
     hosts:
-      - 209.38.199.143
+      - 999.999.999.999 # <2nd IP address>
 
 proxy:
-   host: bear.8301738.xyz
+   host: staging.123456.xyz
 
 env:
   clear:
@@ -173,16 +192,15 @@ env:
 
 accessories:
    postgres:
-      host: 209.38.199.143
+      host: 999.999.999.999 # <2nd IP address>
 
    redis:
-      host: 209.38.199.143
-      cmd: "redis-server --requirepass <%= File.read('.kamal/secrets.staging')[/REDIS_PASSWORD="(.*?)"/, 1] %>"
+      host: 999.999.999.999 # <2nd IP address>
 ```
 
-### 2 Add secrets for staging destination
+### 2 Add .env.staging for staging destination
 
-Create `.kamal/secrets.staging` and add:
+Create `.env.staging` and add:
 
 - KAMAL_REGISTRY_PASSWORD (Docker Hub token from the companion app)
 - SECRET_KEY_BASE (generate secret key base with `rails secret`)
